@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -181,6 +182,8 @@
             font-size: 0.9rem;
             margin-top: auto;
         }
+
+        
     </style>
 </head>
 <body>
@@ -190,10 +193,14 @@
         <!-- Cabeçalho -->
         <header class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
             <div>
-                <h1 class="h3 fw-bold mb-1 text-success d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-spa"></i> Agenda - Tranquila Mente
+                <h1 class="h3 fw-bold mb-1 text-success d-flex align-items-center gap-3">
+                    <i class="fa-solid fa-spa fs-2"></i>
+                    <div class="d-flex flex-column align-items-center text-center" style="font-family: 'Comfortaa', cursive;">
+                        <span class="fs-6 text-uppercase opacity-75" style="letter-spacing: 3px;">Agenda</span>
+                        <span>Tranquila Mente</span>
+                    </div>
                 </h1>
-                <p class="text-muted small mb-0"><strong>Organização simples para mentes inquietas. Um lugar seguro para esvaziar os pensamentos e cultivar o equilíbrio emocional.</strong></p>
+                <p class="text-muted small mb-0 mt-2"><strong>Organização simples para mentes inquietas. Um lugar seguro para esvaziar os pensamentos e cultivar o equilíbrio emocional.</strong></p>
             </div>
             <button class="btn btn-profile-highlight" data-bs-toggle="modal" data-bs-target="#profileModal" title="Personalizar Perfil">
                 <i class="fa-solid fa-user-gear fs-5"></i>

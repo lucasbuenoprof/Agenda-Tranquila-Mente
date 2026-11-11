@@ -36,6 +36,28 @@
             flex-direction: column;
         }
 
+        /* Botão de Perfil em Destaque */
+        .btn-profile-highlight {
+            background-color: var(--accent-soft);
+            color: var(--primary-sage);
+            border: 2px solid var(--primary-sage);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 8px rgba(74, 124, 89, 0.15);
+        }
+
+        .btn-profile-highlight:hover {
+            background-color: var(--primary-sage);
+            color: #ffffff;
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.25);
+        }
+
         .main-container {
             max-width: 900px;
             margin: 0 auto;
@@ -171,10 +193,10 @@
                 <h1 class="h3 fw-bold mb-1 text-success d-flex align-items-center gap-2">
                     <i class="fa-solid fa-spa"></i> Agenda - Tranquila Mente
                 </h1>
-                <p class="text-muted small mb-0"><strong>Organização simples para mentes inquietas. Um lugar seguro para esvaziar os pensamentos e cultivar o equilíbrio emocional.<strong></p>
+                <p class="text-muted small mb-0"><strong>Organização simples para mentes inquietas. Um lugar seguro para esvaziar os pensamentos e cultivar o equilíbrio emocional.</strong></p>
             </div>
-            <button class="btn btn-outline-secondary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#profileModal" title="Personalizar Perfil">
-                <i class="fa-solid fa-user-gear"></i>
+            <button class="btn btn-profile-highlight" data-bs-toggle="modal" data-bs-target="#profileModal" title="Personalizar Perfil">
+                <i class="fa-solid fa-user-gear fs-5"></i>
             </button>
         </header>
 

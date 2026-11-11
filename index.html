@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda - Tranquila Mente</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary-sage: #4a7c59;
+            --primary-sage-hover: #3b6346;
+            --accent-soft: #e8f0ec;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --border-color: #e2e8f0;
+            --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.04);
+            --radius-custom: 16px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        .custom-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-custom);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .quote-card {
+            background: linear-gradient(135deg, #eef5f0 0%, #e3ede6 100%);
+            border-left: 5px solid var(--primary-sage);
+        }
+
+        .alert-card {
+            background: #fff8e7;
+            border-left: 5px solid #f39c12;
+        }
+
+        .btn-sage {
+            background-color: var(--primary-sage);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        .btn-sage:hover {
+            background-color: var(--primary-sage-hover);
+            color: white;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-sage);
+            box-shadow: 0 0 0 0.25rem rgba(74, 124, 89, 0.15);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            border-color: var(--primary-sage);
+        }
+
+        .task-item.completed {
+            background-color: #f8faf9;
+            opacity: 0.75;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .btn-check-custom {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-sage);
+            background: transparent;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-check-custom:hover {
+            background: var(--accent-soft);
+            color: var(--primary-sage);
+        }
+
+        .task-item.completed .btn-check-custom {
+            background: var(--primary-sage);
+            color: white;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.35em 0.8em;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-aguardando { background-color: #e2e8f0; color: #475569; }
+        .badge-andamento { background-color: #e0f2fe; color: #0369a1; }
+        .badge-atrasado { background-color: #fee2e2; color: #b91c1c; }
+        .badge-concluido { background-color: #dcfce7; color: #15803d; }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container main-container py-4">
+        
+        <!-- Cabeçalho -->
+        <header class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <div>
+                <h1 class="h3 fw-bold mb-1 text-success d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-spa"></i> Agenda - Tranquila Mente
+                </h1>
+                <p class="text-muted small mb-0">Organização simples para mentes inquietas. Um lugar seguro para esvaziar os pensamentos e cultivar o equilíbrio emocional.</p>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#profileModal" title="Personalizar Perfil">
+                <i class="fa-solid fa-user-gear"></i>
+            </button>
+        </header>
+
+        <!-- Card de Apresentação do Usuário -->
+        <div id="userGreetingCard" class="custom-card py-3 px-4 d-none">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="mb-1 fw-bold" id="userNameDisplay">Olá!</h5>
+                    <p class="mb-0 text-muted small" id="userNoteDisplay"></p>
+                </div>
+                <i class="fa-regular fa-smile text-success fs-3"></i>
+            </div>
+        </div>
+
+        <!-- Card de Frase Calmante Diária -->
+        <div class="custom-card quote-card">
+            <div class="d-flex align-items-start gap-3">
+                <i class="fa-solid fa-quote-left text-success fs-4 mt-1"></i>
+                <div>
+                    <p class="mb-1 fst-italic text-dark fs-6" id="dailyQuoteText">"Sua mente é um espaço sagrado. Não permita que a pressa o ocupe."</p>
+                    <small class="text-muted fw-bold" id="dailyQuoteAuthor">— Reflexão Diária</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Alertas Rápidos (Próximos 5 Dias) -->
+        <div id="upcomingAlertSection" class="custom-card alert-card d-none">
+            <h6 class="fw-bold text-warning-emphasis mb-3 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-bell"></i> Atenção! (Próximo do Vencimento)
+            </h6>
+            <div id="upcomingTasksList"></div>
+        </div>
+
+        <!-- Formulário de Captura Rápida (Brain Dump) -->
+        <div class="custom-card">
+            <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-success"></i> Descarregar Pensamento / Nova Atividade
+            </h6>
+            <form id="taskForm" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Qual o seu próximo lembrete?</label>
+                    <input type="text" id="taskAction" class="form-control" placeholder="Ex: Tomar remédio, Pagar conta, Estudar..." required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Data (Opcional)</label>
+                    <input type="date" id="taskDate" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Hora (Opcional)</label>
+                    <input type="time" id="taskTime" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Status Inicial</label>
+                    <select id="taskStatus" class="form-select">
+                        <option value="Aguardando">Aguardando</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluído">Concluído</option>
+                    </select>
+                </div>
+                <div class="col-md-8 d-flex align-items-end">
+                    <button type="submit" class="btn btn-sage w-100">
+                        <i class="fa-solid fa-check"></i> Anotar na Agenda
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Busca e Lista de Atividades -->
+        <div class="custom-card">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+                <h6 class="fw-bold mb-0">Suas Atividades</h6>
+                <div class="w-100 w-md-auto" style="max-width: 300px;">
+                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar atividade...">
+                </div>
+            </div>
+            
+            <div id="tasksList">
+                <!-- Atividades injetadas dinamicamente -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal de Perfil Personalizado -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content style-modal" style="border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Seu Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Seu Nome</label>
+                        <input type="text" id="profileNameInput" class="form-control" placeholder="Como deseja ser chamado(a)?">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Lembrete Pessoal / Mantra</label>
+                        <input type="text" id="profileNoteInput" class="form-control" placeholder="Ex: Um passo de cada vez.">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-sage" onclick="saveProfile()" data-bs-dismiss="modal">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Atividade -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content style-modal" style="border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square text-success me-2"></i>Editar Atividade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editTaskId">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Atividade</label>
+                        <input type="text" id="editTaskAction" class="form-control" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Data</label>
+                            <input type="date" id="editTaskDate" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Hora</label>
+                            <input type="time" id="editTaskTime" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Status</label>
+                        <select id="editTaskStatus" class="form-select">
+                            <option value="Aguardando">Aguardando</option>
+                            <option value="Em Andamento">Em Andamento</option>
+                            <option value="Concluído">Concluído</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-sage btn-sm" onclick="saveEditedTask()">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer>
+        <p class="mb-0"><strong>LB_Solutions™ - 2026</strong> | Desacelere a mente. O resto a gente organiza juntos!</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Banco de Frases Reais focadas em Paz e Leveza
+        const calmingQuotes = [
+            { quote: "A paz vem de dentro. Não a procure à sua volta.", author: "Buda" },
+            { quote: "Sentar-se em silêncio, sem fazer nada, a primavera chega e a grama cresce por si mesma.", author: "Provérbio Zen" },
+            { quote: "Não se preocupe com o amanhã, pois o amanhã trará suas próprias preocupações. Já basta a cada dia o seu próprio cuidado.", author: "Sermão da Montanha" },
+            { quote: "A inspiração vem quando você respira fundo. Expire a tensão, inspire a presença.", author: "Thich Nhat Hanh (Mestre Zen)" },
+            { quote: "Você não pode parar as ondas, mas pode aprender a surfá-las.", author: "Jon Kabat-Zinn (Pai do Mindfulness)" },
+            { quote: "A vida é agora. Nunca houve um momento em que sua vida não fosse 'agora'.", author: "Eckhart Tolle" },
+            { quote: "Na tranqüilidade, a mente encontra a clareza e a alma descobre o seu ritmo.", author: "Lao Tsé" },
+            { quote: "Seja mestre da sua mente, não escravo dos seus pensamentos.", author: "Dhammapada" },
+            { quote: "A felicidade é a desaceleração do tempo interior.", author: "Rubem Alves" },
+            { quote: "Respire. Solte os ombros. O momento presente é o único lugar onde você realmente existe.", author: "Thich Nhat Hanh" }
+        ];
+
+        let tasks = JSON.parse(localStorage.getItem('tranquil_tasks')) || [];
+        let profile = JSON.parse(localStorage.getItem('tranquil_profile')) || { name: '', note: '' };
+        let editModalInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initDailyQuote();
+            renderProfile();
+            renderTasks();
+
+            document.getElementById('taskForm').addEventListener('submit', addTask);
+            document.getElementById('searchInput').addEventListener('input', renderTasks);
+            editModalInstance = new bootstrap.Modal(document.getElementById('editTaskModal'));
+        });
+
+        function initDailyQuote() {
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            const selectedQuote = calmingQuotes[dayOfYear % calmingQuotes.length];
+
+            document.getElementById('dailyQuoteText').innerText = `"${selectedQuote.quote}"`;
+            document.getElementById('dailyQuoteAuthor').innerText = `— ${selectedQuote.author}`;
+        }
+
+        function renderProfile() {
+            if (profile.name) {
+                document.getElementById('userNameDisplay').innerText = `Olá, ${profile.name}!`;
+                document.getElementById('userNoteDisplay').innerText = profile.note || 'Um dia de cada vez.';
+                document.getElementById('userGreetingCard').classList.remove('d-none');
+            }
+            document.getElementById('profileNameInput').value = profile.name || '';
+            document.getElementById('profileNoteInput').value = profile.note || '';
+        }
+
+        function saveProfile() {
+            profile.name = document.getElementById('profileNameInput').value;
+            profile.note = document.getElementById('profileNoteInput').value;
+            localStorage.setItem('tranquil_profile', JSON.stringify(profile));
+            renderProfile();
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const action = document.getElementById('taskAction').value;
+            const date = document.getElementById('taskDate').value;
+            const time = document.getElementById('taskTime').value;
+            const status = document.getElementById('taskStatus').value;
+
+            const newTask = {
+                id: Date.now(),
+                action,
+                date,
+                time,
+                status
+            };
+
+            tasks.push(newTask);
+            saveAndRender();
+            document.getElementById('taskForm').reset();
+        }
+
+        function toggleCheck(id) {
+            tasks = tasks.map(t => {
+                if (t.id === id) {
+                    const newStatus = t.status === 'Concluído' ? 'Aguardando' : 'Concluído';
+                    if (newStatus === 'Concluído') {
+                        triggerConfetti();
+                    }
+                    return { ...t, status: newStatus };
+                }
+                return t;
+            });
+            saveAndRender();
+        }
+
+        function openEditModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            document.getElementById('editTaskId').value = task.id;
+            document.getElementById('editTaskAction').value = task.action;
+            document.getElementById('editTaskDate').value = task.date || '';
+            document.getElementById('editTaskTime').value = task.time || '';
+            document.getElementById('editTaskStatus').value = task.status;
+
+            editModalInstance.show();
+        }
+
+        function saveEditedTask() {
+            const id = parseInt(document.getElementById('editTaskId').value);
+            const action = document.getElementById('editTaskAction').value;
+            const date = document.getElementById('editTaskDate').value;
+            const time = document.getElementById('editTaskTime').value;
+            const status = document.getElementById('editTaskStatus').value;
+
+            if (!action.trim()) return;
+
+            tasks = tasks.map(t => {
+                if (t.id === id) {
+                    return { ...t, action, date, time, status };
+                }
+                return t;
+            });
+
+            saveAndRender();
+            editModalInstance.hide();
+        }
+
+        function deleteTask(id) {
+            const confirmDelete = confirm("Tem certeza de que deseja excluir esta atividade?");
+            if (confirmDelete) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveAndRender();
+            }
+        }
+
+        function triggerConfetti() {
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.8 },
+                colors: ['#4a7c59', '#88b04b', '#d4edda']
+            });
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('tranquil_tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const listContainer = document.getElementById('tasksList');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            listContainer.innerHTML = '';
+
+            const filteredTasks = tasks.filter(t => t.action.toLowerCase().includes(searchVal));
+
+            if (filteredTasks.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-regular fa-calendar-check fs-2 mb-2"></i>
+                        <p class="mb-0">Nenhuma atividade registrada por aqui. Aproveite a calma!</p>
+                    </div>`;
+            } else {
+                filteredTasks.sort((a, b) => {
+                    if (!a.date) return 1;
+                    if (!b.date) return -1;
+                    return new Date(a.date) - new Date(b.date);
+                });
+
+                filteredTasks.forEach(task => {
+                    const isCompleted = task.status === 'Concluído';
+                    const item = document.createElement('div');
+                    item.className = `task-item ${isCompleted ? 'completed' : ''}`;
+                    
+                    item.innerHTML = `
+                        <div class="d-flex align-items-center me-2">
+                            <button class="btn-check-custom" onclick="toggleCheck(${task.id})">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                            <div>
+                                <div class="task-title fw-semibold">${task.action}</div>
+                                <div class="small text-muted">
+                                    <i class="fa-regular fa-clock me-1"></i> ${formatDate(task.date)} ${task.time ? '| ' + task.time : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge-status badge-${getStatusClass(task.status)}">${task.status}</span>
+                            <button class="btn btn-link text-secondary p-0 ms-1" onclick="openEditModal(${task.id})" title="Editar atividade">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn btn-link text-danger p-0 ms-1" onclick="deleteTask(${task.id})" title="Excluir atividade">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            }
+
+            renderUpcomingAlerts();
+        }
+
+        function renderUpcomingAlerts() {
+            const alertSection = document.getElementById('upcomingAlertSection');
+            const alertList = document.getElementById('upcomingTasksList');
+            alertList.innerHTML = '';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const upcoming = tasks.filter(task => {
+                if (task.status === 'Concluído' || !task.date) return false;
+                const taskDate = new Date(task.date + 'T00:00:00');
+                const diffTime = taskDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 2;
+            });
+
+            if (upcoming.length > 0) {
+                alertSection.classList.remove('d-none');
+                upcoming.forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = 'd-flex justify-content-between align-items-center py-1 border-bottom border-warning-subtle';
+                    div.innerHTML = `
+                        <span class="small fw-semibold text-dark">${t.action}</span>
+                        <small class="text-muted">${formatDate(t.date)}</small>
+                    `;
+                    alertList.appendChild(div);
+                });
+            } else {
+                alertSection.classList.add('d-none');
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Sem data';
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Em Andamento': return 'andamento';
+                case 'Concluído': return 'concluido';
+                default: return 'aguardando';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -26,6 +26,21 @@
             --border-color: #e2e8f0;
             --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.04);
             --radius-custom: 16px;
+            --input-bg: #ffffff;
+            --item-bg: #ffffff;
+        }
+
+        /* Estilos do Modo Escuro */
+        body.dark-mode {
+            --bg-main: #0f172a;
+            --card-bg: #1e293b;
+            --accent-soft: #1e3a29;
+            --text-dark: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.3);
+            --input-bg: #0f172a;
+            --item-bg: #0f172a;
         }
 
         body {
@@ -35,6 +50,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Botão de Perfil em Destaque */
@@ -72,7 +88,7 @@
             box-shadow: var(--shadow-soft);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
         }
 
         .quote-card {
@@ -80,8 +96,18 @@
             border-left: 5px solid var(--primary-sage);
         }
 
+        body.dark-mode .quote-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-left: 5px solid var(--primary-sage);
+        }
+
         .alert-card {
             background: #fff8e7;
+            border-left: 5px solid #f39c12;
+        }
+
+        body.dark-mode .alert-card {
+            background: #2d2618;
             border-left: 5px solid #f39c12;
         }
 
@@ -100,15 +126,27 @@
             color: white;
         }
 
-        .form-control, .form-select {
+        .form-control, .form-select, .input-group-text {
             border-radius: 10px;
             border: 1px solid var(--border-color);
             padding: 0.6rem 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-dark);
+        }
+
+        body.dark-mode .form-control, 
+        body.dark-mode .form-select,
+        body.dark-mode .input-group-text {
+            background-color: var(--input-bg);
+            color: var(--text-dark);
+            border-color: var(--border-color);
         }
 
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-sage);
             box-shadow: 0 0 0 0.25rem rgba(74, 124, 89, 0.15);
+            background-color: var(--input-bg);
+            color: var(--text-dark);
         }
 
         /* Container de Rolagem das Atividades */
@@ -122,12 +160,15 @@
             width: 6px;
         }
         .tasks-scroll-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: rgba(0, 0, 0, 0.05);
             border-radius: 10px;
         }
         .tasks-scroll-container::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
+        }
+        body.dark-mode .tasks-scroll-container::-webkit-scrollbar-thumb {
+            background: #475569;
         }
 
         .task-item {
@@ -136,7 +177,7 @@
             justify-content: space-between;
             padding: 1rem;
             border-radius: 12px;
-            background: #ffffff;
+            background: var(--item-bg);
             border: 1px solid var(--border-color);
             margin-bottom: 0.75rem;
             transition: all 0.2s ease;
@@ -147,8 +188,11 @@
         }
 
         .task-item.completed {
-            background-color: #f8faf9;
             opacity: 0.75;
+        }
+
+        body.dark-mode .task-item.completed {
+            background-color: #1e293b;
         }
 
         .task-item.completed .task-title {
@@ -159,8 +203,13 @@
         /* Estilo para Aniversários */
         .task-item.birthday-task-item {
             border-color: #d8b4fe;
-            background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+            background: linear-gradient(135deg, var(--item-bg) 0%, #faf5ff 100%);
             box-shadow: 0 2px 10px rgba(168, 85, 247, 0.08);
+        }
+
+        body.dark-mode .task-item.birthday-task-item {
+            border-color: #7e22ce;
+            background: linear-gradient(135deg, #1e293b 0%, #2e1065 100%);
         }
 
         .btn-check-custom {
@@ -202,6 +251,19 @@
         .badge-concluido { background-color: #dcfce7; color: #15803d; }
         .badge-diario { background-color: #fef3c7; color: #92400e; }
         .badge-aniversario { background-color: #f3e8ff; color: #6b21a8; }
+
+        body.dark-mode .badge-aguardando { background-color: #334155; color: #cbd5e1; }
+        body.dark-mode .badge-andamento { background-color: #075985; color: #e0f2fe; }
+        body.dark-mode .badge-atrasado { background-color: #991b1b; color: #fee2e2; }
+        body.dark-mode .badge-concluido { background-color: #166534; color: #dcfce7; }
+        body.dark-mode .badge-diario { background-color: #78350f; color: #fef3c7; }
+        body.dark-mode .badge-aniversario { background-color: #581c87; color: #f3e8ff; }
+
+        .modal-content.style-modal {
+            background-color: var(--card-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
 
         footer {
             text-align: center;
@@ -249,7 +311,7 @@
             <div class="d-flex align-items-start gap-3">
                 <i class="fa-solid fa-quote-left text-success fs-4 mt-1"></i>
                 <div>
-                    <p class="mb-1 fst-italic text-dark fs-6" id="dailyQuoteText">"Sua mente é um espaço sagrado. Não permita que a pressa o ocupe."</p>
+                    <p class="mb-1 fst-italic fs-6" id="dailyQuoteText">"Sua mente é um espaço sagrado. Não permita que a pressa o ocupe."</p>
                     <small class="text-muted fw-bold" id="dailyQuoteAuthor">— Reflexão Diária</small>
                 </div>
             </div>
@@ -324,7 +386,7 @@
                 <h6 class="fw-bold mb-1">Meus Lembretes e Atividades!</h6>
                 <div class="d-flex flex-column flex-sm-row gap-2 w-100">
                     <div class="input-group input-group-sm w-100">
-                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-regular fa-calendar-days"></i></span>
+                        <span class="input-group-text border-end-0 text-muted"><i class="fa-regular fa-calendar-days"></i></span>
                         <input type="text" id="dateFilterInput" class="form-control border-start-0 ps-0" placeholder="Filtrar por data..." onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
                     </div>
                     <input type="text" id="searchInput" class="form-control form-control-sm w-100" placeholder="Buscar atividade...">
@@ -368,6 +430,13 @@
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Lembrete Pessoal / Mantra</label>
                         <input type="text" id="profileNoteInput" class="form-control" placeholder="Ex: Um passo de cada vez.">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Tema de Cores</label>
+                        <select id="profileThemeInput" class="form-select">
+                            <option value="light">Modo Claro ☀️</option>
+                            <option value="dark">Modo Escuro 🌙</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -447,7 +516,7 @@
         ];
 
         let tasks = JSON.parse(localStorage.getItem('tranquil_tasks')) || [];
-        let profile = JSON.parse(localStorage.getItem('tranquil_profile')) || { name: '', note: '' };
+        let profile = JSON.parse(localStorage.getItem('tranquil_profile')) || { name: '', note: '', theme: 'light' };
         let editModalInstance = null;
 
         // Contexto de Áudio para os Efeitos Sonoros
@@ -512,6 +581,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
             initDailyQuote();
             renderProfile();
             renderTasks();
@@ -521,6 +591,14 @@
             document.getElementById('dateFilterInput').addEventListener('change', renderTasks);
             editModalInstance = new bootstrap.Modal(document.getElementById('editTaskModal'));
         });
+
+        function applyTheme() {
+            if (profile.theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
 
         function initDailyQuote() {
             const today = new Date();
@@ -539,12 +617,15 @@
             }
             document.getElementById('profileNameInput').value = profile.name || '';
             document.getElementById('profileNoteInput').value = profile.note || '';
+            document.getElementById('profileThemeInput').value = profile.theme || 'light';
         }
 
         function saveProfile() {
             profile.name = document.getElementById('profileNameInput').value;
             profile.note = document.getElementById('profileNoteInput').value;
+            profile.theme = document.getElementById('profileThemeInput').value;
             localStorage.setItem('tranquil_profile', JSON.stringify(profile));
+            applyTheme();
             renderProfile();
         }
 

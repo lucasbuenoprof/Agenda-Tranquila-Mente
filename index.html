@@ -304,8 +304,11 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
                 <h6 class="fw-bold mb-0">Meus Lembretes e Atividades!</h6>
                 <div class="d-flex gap-2 w-100 w-md-auto flex-wrap" style="max-width: 550px;">
-                    <input type="date" id="dateFilterInput" class="form-control form-control-sm" placeholder="Buscar dia...">
-                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar atividade...">
+                    <div class="input-group input-group-sm flex-nowrap" style="max-width: 200px;">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-regular fa-calendar-days"></i></span>
+                        <input type="text" id="dateFilterInput" class="form-control border-start-0 ps-0" placeholder="Filtrar por data..." onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+                    </div>
+                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar atividade..." style="max-width: 200px;">
                     <div class="dropdown">
                         <button class="btn btn-outline-danger btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             <i class="fa-solid fa-trash-can me-1"></i>Limpar

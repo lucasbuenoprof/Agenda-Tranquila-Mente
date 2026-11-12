@@ -174,6 +174,7 @@
         .badge-andamento { background-color: #e0f2fe; color: #0369a1; }
         .badge-atrasado { background-color: #fee2e2; color: #b91c1c; }
         .badge-concluido { background-color: #dcfce7; color: #15803d; }
+        .badge-diario { background-color: #fef3c7; color: #92400e; }
 
         footer {
             text-align: center;
@@ -182,8 +183,6 @@
             font-size: 0.9rem;
             margin-top: auto;
         }
-
-        
     </style>
 </head>
 <body>
@@ -240,18 +239,33 @@
         <!-- Formulário de Captura Rápida (Brain Dump) -->
         <div class="custom-card">
             <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                <i class="fa-solid fa-plus-circle text-success"></i> Descarregar Pensamento / Nova Atividade
+                <i class="fa-solid fa-plus-circle text-success"></i> Anotar novo Lembrete / Atividade
             </h6>
             <form id="taskForm" class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label small fw-semibold">Qual o seu próximo lembrete?</label>
                     <input type="text" id="taskAction" class="form-control" placeholder="Ex: Tomar remédio, Pagar conta, Estudar..." required>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-semibold">Data (Opcional)</label>
-                    <input type="date" id="taskDate" class="form-control">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold d-flex justify-content-between align-items-center">
+                        <span>Data(s) (Opcional)</span>
+                        <button type="button" class="btn btn-link text-success p-0 text-decoration-none small fw-bold" id="btnAddDateField" onclick="addDateField()">
+                            <i class="fa-solid fa-plus me-1"></i>Adicionar Data
+                        </button>
+                    </label>
+                    <div id="dateFieldsContainer">
+                        <div class="input-group mb-2 date-input-row">
+                            <input type="date" class="form-control task-date-input">
+                        </div>
+                    </div>
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox" id="taskIsDaily" onchange="toggleDailyOption(this)">
+                        <label class="form-check-label small fw-semibold text-success" for="taskIsDaily">
+                            <i class="fa-solid fa-rotate me-1"></i>Cadastrar como diário (Todo dia)
+                        </label>
+                    </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label class="form-label small fw-semibold">Hora (Opcional)</label>
                     <input type="time" id="taskTime" class="form-control">
                 </div>
@@ -263,7 +277,7 @@
                         <option value="Concluído">Concluído</option>
                     </select>
                 </div>
-                <div class="col-md-8 d-flex align-items-end">
+                <div class="col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-sage w-100">
                         <i class="fa-solid fa-check"></i> Anotar na Agenda
                     </button>
@@ -274,9 +288,20 @@
         <!-- Busca e Lista de Atividades -->
         <div class="custom-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
-                <h6 class="fw-bold mb-0">Suas Atividades</h6>
-                <div class="w-100 w-md-auto" style="max-width: 300px;">
+                <h6 class="fw-bold mb-0">Meus Lembretes e Atividades!</h6>
+                <div class="d-flex gap-2 w-100 w-md-auto flex-wrap" style="max-width: 550px;">
+                    <input type="date" id="dateFilterInput" class="form-control form-control-sm" title="Filtrar por dia">
                     <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar atividade...">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-danger btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-trash-can me-1"></i>Limpar
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item small text-danger" href="#" onclick="deleteTasksBySelectedDate()"><i class="fa-solid fa-calendar-xmark me-2"></i>Apagar deste dia</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteAllTasks()"><i class="fa-solid fa-triangle-exclamation me-2"></i>Apagar TUDO</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             
@@ -387,6 +412,7 @@
 
             document.getElementById('taskForm').addEventListener('submit', addTask);
             document.getElementById('searchInput').addEventListener('input', renderTasks);
+            document.getElementById('dateFilterInput').addEventListener('change', renderTasks);
             editModalInstance = new bootstrap.Modal(document.getElementById('editTaskModal'));
         });
 
@@ -416,24 +442,110 @@
             renderProfile();
         }
 
+        function toggleDailyOption(checkbox) {
+            const dateInputs = document.querySelectorAll('.task-date-input');
+            const btnAdd = document.getElementById('btnAddDateField');
+
+            if (checkbox.checked) {
+                dateInputs.forEach(i => i.disabled = true);
+                btnAdd.style.pointerEvents = 'none';
+                btnAdd.style.opacity = '0.5';
+            } else {
+                dateInputs.forEach(i => i.disabled = false);
+                btnAdd.style.pointerEvents = 'auto';
+                btnAdd.style.opacity = '1';
+            }
+        }
+
+        function addDateField() {
+            const container = document.getElementById('dateFieldsContainer');
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2 date-input-row';
+            div.innerHTML = `
+                <input type="date" class="form-control task-date-input">
+                <button type="button" class="btn btn-outline-danger" onclick="removeDateField(this)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeDateField(button) {
+            const container = document.getElementById('dateFieldsContainer');
+            if (container.children.length > 1) {
+                button.closest('.date-input-row').remove();
+            } else {
+                button.closest('.date-input-row').querySelector('input').value = '';
+            }
+        }
+
         function addTask(e) {
             e.preventDefault();
             const action = document.getElementById('taskAction').value;
-            const date = document.getElementById('taskDate').value;
             const time = document.getElementById('taskTime').value;
             const status = document.getElementById('taskStatus').value;
+            const isDaily = document.getElementById('taskIsDaily').checked;
+            
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const createdAt = `${year}-${month}-${day}`;
 
-            const newTask = {
-                id: Date.now(),
-                action,
-                date,
-                time,
-                status
-            };
+            if (isDaily) {
+                const newTask = {
+                    id: Date.now(),
+                    action,
+                    date: '',
+                    time,
+                    status,
+                    isDaily: true,
+                    createdAt
+                };
+                tasks.push(newTask);
+            } else {
+                const dateInputs = document.querySelectorAll('.task-date-input');
+                const dates = Array.from(dateInputs).map(i => i.value).filter(val => val !== '');
 
-            tasks.push(newTask);
+                if (dates.length === 0) {
+                    const newTask = {
+                        id: Date.now(),
+                        action,
+                        date: '',
+                        time,
+                        status,
+                        isDaily: false,
+                        createdAt
+                    };
+                    tasks.push(newTask);
+                } else {
+                    dates.forEach((dateVal, index) => {
+                        const newTask = {
+                            id: Date.now() + index,
+                            action,
+                            date: dateVal,
+                            time,
+                            status,
+                            isDaily: false,
+                            createdAt
+                        };
+                        tasks.push(newTask);
+                    });
+                }
+            }
+
             saveAndRender();
             document.getElementById('taskForm').reset();
+            document.getElementById('taskIsDaily').checked = false;
+            toggleDailyOption(document.getElementById('taskIsDaily'));
+            
+            // Reseta para ter apenas 1 campo de data após enviar
+            const container = document.getElementById('dateFieldsContainer');
+            container.innerHTML = `
+                <div class="input-group mb-2 date-input-row">
+                    <input type="date" class="form-control task-date-input">
+                </div>
+            `;
         }
 
         function toggleCheck(id) {
@@ -491,6 +603,33 @@
             }
         }
 
+        function deleteTasksBySelectedDate() {
+            const selectedDate = document.getElementById('dateFilterInput').value;
+            if (!selectedDate) {
+                alert("Por favor, selecione primeiro uma data no campo de filtro para apagar as atividades daquele dia específico.");
+                return;
+            }
+
+            const confirmDelete = confirm(`Tem certeza de que deseja apagar TODAS as atividades cadastradas para o dia ${formatDate(selectedDate)}?`);
+            if (confirmDelete) {
+                tasks = tasks.filter(t => {
+                    if (t.isDaily) return true; // Mantém rotinas diárias intactas ao limpar um único dia
+                    if (t.date) return t.date !== selectedDate;
+                    const taskCreatedDate = t.createdAt || formatDateFromId(t.id);
+                    return taskCreatedDate !== selectedDate;
+                });
+                saveAndRender();
+            }
+        }
+
+        function deleteAllTasks() {
+            const confirmDelete = confirm("ATENÇÃO: Deseja apagar permanentemente TODAS as suas atividades e lembretes da agenda?");
+            if (confirmDelete) {
+                tasks = [];
+                saveAndRender();
+            }
+        }
+
         function triggerConfetti() {
             confetti({
                 particleCount: 50,
@@ -508,9 +647,26 @@
         function renderTasks() {
             const listContainer = document.getElementById('tasksList');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const selectedDate = document.getElementById('dateFilterInput').value;
             listContainer.innerHTML = '';
 
-            const filteredTasks = tasks.filter(t => t.action.toLowerCase().includes(searchVal));
+            const filteredTasks = tasks.filter(t => {
+                const matchesText = t.action.toLowerCase().includes(searchVal);
+                
+                let matchesDate = true;
+                if (selectedDate) {
+                    if (t.isDaily) {
+                        matchesDate = true;
+                    } else if (t.date) {
+                        matchesDate = (t.date === selectedDate);
+                    } else {
+                        const taskCreatedDate = t.createdAt || formatDateFromId(t.id);
+                        matchesDate = (taskCreatedDate === selectedDate);
+                    }
+                }
+
+                return matchesText && matchesDate;
+            });
 
             if (filteredTasks.length === 0) {
                 listContainer.innerHTML = `
@@ -520,6 +676,8 @@
                     </div>`;
             } else {
                 filteredTasks.sort((a, b) => {
+                    if (a.isDaily && !b.isDaily) return -1;
+                    if (!a.isDaily && b.isDaily) return 1;
                     if (!a.date) return 1;
                     if (!b.date) return -1;
                     return new Date(a.date) - new Date(b.date);
@@ -538,11 +696,12 @@
                             <div>
                                 <div class="task-title fw-semibold">${task.action}</div>
                                 <div class="small text-muted">
-                                    <i class="fa-regular fa-clock me-1"></i> ${formatDate(task.date)} ${task.time ? '| ' + task.time : ''}
+                                    <i class="fa-regular fa-clock me-1"></i> ${task.isDaily ? 'Todo dia' : formatDate(task.date)} ${task.time ? '| ' + task.time : ''}
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
+                            ${task.isDaily ? '<span class="badge-status badge-diario"><i class="fa-solid fa-rotate me-1"></i>Diário</span>' : ''}
                             <span class="badge-status badge-${getStatusClass(task.status)}">${task.status}</span>
                             <button class="btn btn-link text-secondary p-0 ms-1" onclick="openEditModal(${task.id})" title="Editar atividade">
                                 <i class="fa-solid fa-pen-to-square"></i>
@@ -559,6 +718,14 @@
             renderUpcomingAlerts();
         }
 
+        function formatDateFromId(id) {
+            const dateObj = new Date(id);
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function renderUpcomingAlerts() {
             const alertSection = document.getElementById('upcomingAlertSection');
             const alertList = document.getElementById('upcomingTasksList');
@@ -568,7 +735,7 @@
             today.setHours(0, 0, 0, 0);
 
             const upcoming = tasks.filter(task => {
-                if (task.status === 'Concluído' || !task.date) return false;
+                if (task.status === 'Concluído' || !task.date || task.isDaily) return false;
                 const taskDate = new Date(task.date + 'T00:00:00');
                 const diffTime = taskDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

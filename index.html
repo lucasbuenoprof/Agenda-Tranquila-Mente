@@ -137,6 +137,13 @@
             color: var(--text-muted);
         }
 
+        /* Estilo para Aniversários */
+        .task-item.birthday-task-item {
+            border-color: #d8b4fe;
+            background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+            box-shadow: 0 2px 10px rgba(168, 85, 247, 0.08);
+        }
+
         .btn-check-custom {
             width: 32px;
             height: 32px;
@@ -175,6 +182,7 @@
         .badge-atrasado { background-color: #fee2e2; color: #b91c1c; }
         .badge-concluido { background-color: #dcfce7; color: #15803d; }
         .badge-diario { background-color: #fef3c7; color: #92400e; }
+        .badge-aniversario { background-color: #f3e8ff; color: #6b21a8; }
 
         footer {
             text-align: center;
@@ -244,7 +252,7 @@
             <form id="taskForm" class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label small fw-semibold">Qual o seu próximo lembrete?</label>
-                    <input type="text" id="taskAction" class="form-control" placeholder="Ex: Tomar remédio, Pagar conta, Estudar..." required>
+                    <input type="text" id="taskAction" class="form-control" placeholder="Ex: Tomar remédio, Aniversário do Lucas, Estudar..." required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label small fw-semibold d-flex justify-content-between align-items-center">
@@ -271,16 +279,22 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">Status Inicial</label>
-                    <select id="taskStatus" class="form-select">
+                    <select id="taskStatus" class="form-select" onchange="toggleGiftField('taskStatus', 'giftFieldCol')">
                         <option value="Aguardando">Aguardando</option>
                         <option value="Em Andamento">Em Andamento</option>
+                        <option value="Aniversário">Aniversário 🎂</option>
                         <option value="Concluído">Concluído</option>
                     </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-4 d-flex align-items-end" id="btnSubmitCol">
                     <button type="submit" class="btn btn-sage w-100">
                         <i class="fa-solid fa-check"></i> Anotar na Agenda
                     </button>
+                </div>
+                <!-- Campo Dinâmico de Dica de Presente -->
+                <div class="col-12 d-none" id="giftFieldCol">
+                    <label class="form-label small fw-semibold text-purple"><i class="fa-solid fa-gift me-1"></i>Dica de Presente / Ideia de Lembrança (Opcional)</label>
+                    <input type="text" id="taskGift" class="form-control" placeholder="Ex: Livro de ficção, Chocolate meio amargo, Camisa M...">
                 </div>
             </form>
         </div>
@@ -363,11 +377,16 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Status</label>
-                        <select id="editTaskStatus" class="form-select">
+                        <select id="editTaskStatus" class="form-select" onchange="toggleGiftField('editTaskStatus', 'editGiftFieldCol')">
                             <option value="Aguardando">Aguardando</option>
                             <option value="Em Andamento">Em Andamento</option>
+                            <option value="Aniversário">Aniversário 🎂</option>
                             <option value="Concluído">Concluído</option>
                         </select>
+                    </div>
+                    <div class="mb-3 d-none" id="editGiftFieldCol">
+                        <label class="form-label small fw-semibold text-purple"><i class="fa-solid fa-gift me-1"></i>Dica de Presente / Lembrança</label>
+                        <input type="text" id="editTaskGift" class="form-control" placeholder="Ideia de presente...">
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -404,6 +423,67 @@
         let tasks = JSON.parse(localStorage.getItem('tranquil_tasks')) || [];
         let profile = JSON.parse(localStorage.getItem('tranquil_profile')) || { name: '', note: '' };
         let editModalInstance = null;
+
+        // Contexto de Áudio para os Efeitos Sonoros
+        let audioCtx = null;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playCompletionSound(isBirthday = false) {
+            try {
+                initAudioContext();
+                const now = audioCtx.currentTime;
+
+                if (isBirthday) {
+                    // Som de Aniversário (Arpejo Festivo)
+                    const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    freqs.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.08));
+                        gain.gain.setValueAtTime(0.2, now + (idx * 0.08));
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.08) + 0.35);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + (idx * 0.08));
+                        osc.stop(now + (idx * 0.08) + 0.35);
+                    });
+                } else {
+                    // Som padrão suave (Dois tons em chime)
+                    const osc1 = audioCtx.createOscillator();
+                    const gain1 = audioCtx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(783.99, now); // G5
+                    gain1.gain.setValueAtTime(0.15, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc1.connect(gain1);
+                    gain1.connect(audioCtx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.3);
+
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(1046.50, now + 0.08); // C6
+                    gain2.gain.setValueAtTime(0.2, now + 0.08);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start(now + 0.08);
+                    osc2.stop(now + 0.45);
+                }
+            } catch (e) {
+                // Ignora se o áudio estiver desativado pelo navegador
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             initDailyQuote();
@@ -457,6 +537,16 @@
             }
         }
 
+        function toggleGiftField(selectId, giftColId) {
+            const statusVal = document.getElementById(selectId).value;
+            const giftCol = document.getElementById(giftColId);
+            if (statusVal === 'Aniversário') {
+                giftCol.classList.remove('d-none');
+            } else {
+                giftCol.classList.add('d-none');
+            }
+        }
+
         function addDateField() {
             const container = document.getElementById('dateFieldsContainer');
             const div = document.createElement('div');
@@ -485,6 +575,7 @@
             const time = document.getElementById('taskTime').value;
             const status = document.getElementById('taskStatus').value;
             const isDaily = document.getElementById('taskIsDaily').checked;
+            const gift = status === 'Aniversário' ? document.getElementById('taskGift').value : '';
             
             const today = new Date();
             const year = today.getFullYear();
@@ -500,6 +591,7 @@
                     time,
                     status,
                     isDaily: true,
+                    gift,
                     createdAt
                 };
                 tasks.push(newTask);
@@ -515,6 +607,7 @@
                         time,
                         status,
                         isDaily: false,
+                        gift,
                         createdAt
                     };
                     tasks.push(newTask);
@@ -527,6 +620,7 @@
                             time,
                             status,
                             isDaily: false,
+                            gift,
                             createdAt
                         };
                         tasks.push(newTask);
@@ -538,8 +632,9 @@
             document.getElementById('taskForm').reset();
             document.getElementById('taskIsDaily').checked = false;
             toggleDailyOption(document.getElementById('taskIsDaily'));
+            toggleGiftField('taskStatus', 'giftFieldCol');
             
-            // Reseta para ter apenas 1 campo de data após enviar
+            // Reseta para 1 campo de data após enviar
             const container = document.getElementById('dateFieldsContainer');
             container.innerHTML = `
                 <div class="input-group mb-2 date-input-row">
@@ -553,7 +648,9 @@
                 if (t.id === id) {
                     const newStatus = t.status === 'Concluído' ? 'Aguardando' : 'Concluído';
                     if (newStatus === 'Concluído') {
-                        triggerConfetti();
+                        const isBday = t.status === 'Aniversário';
+                        playCompletionSound(isBday);
+                        triggerConfetti(isBday);
                     }
                     return { ...t, status: newStatus };
                 }
@@ -571,7 +668,9 @@
             document.getElementById('editTaskDate').value = task.date || '';
             document.getElementById('editTaskTime').value = task.time || '';
             document.getElementById('editTaskStatus').value = task.status;
+            document.getElementById('editTaskGift').value = task.gift || '';
 
+            toggleGiftField('editTaskStatus', 'editGiftFieldCol');
             editModalInstance.show();
         }
 
@@ -581,12 +680,13 @@
             const date = document.getElementById('editTaskDate').value;
             const time = document.getElementById('editTaskTime').value;
             const status = document.getElementById('editTaskStatus').value;
+            const gift = status === 'Aniversário' ? document.getElementById('editTaskGift').value : '';
 
             if (!action.trim()) return;
 
             tasks = tasks.map(t => {
                 if (t.id === id) {
-                    return { ...t, action, date, time, status };
+                    return { ...t, action, date, time, status, gift };
                 }
                 return t;
             });
@@ -613,7 +713,7 @@
             const confirmDelete = confirm(`Tem certeza de que deseja apagar TODAS as atividades cadastradas para o dia ${formatDate(selectedDate)}?`);
             if (confirmDelete) {
                 tasks = tasks.filter(t => {
-                    if (t.isDaily) return true; // Mantém rotinas diárias intactas ao limpar um único dia
+                    if (t.isDaily) return true;
                     if (t.date) return t.date !== selectedDate;
                     const taskCreatedDate = t.createdAt || formatDateFromId(t.id);
                     return taskCreatedDate !== selectedDate;
@@ -630,13 +730,23 @@
             }
         }
 
-        function triggerConfetti() {
-            confetti({
-                particleCount: 50,
-                spread: 60,
-                origin: { y: 0.8 },
-                colors: ['#4a7c59', '#88b04b', '#d4edda']
-            });
+        function triggerConfetti(isBirthday = false) {
+            if (isBirthday) {
+                // Confete reforçado/festivo para aniversários
+                confetti({
+                    particleCount: 100,
+                    spread: 80,
+                    origin: { y: 0.7 },
+                    colors: ['#a855f7', '#ec4899', '#f59e0b', '#10b981', '#3b82f6']
+                });
+            } else {
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.8 },
+                    colors: ['#4a7c59', '#88b04b', '#d4edda']
+                });
+            }
         }
 
         function saveAndRender() {
@@ -685,8 +795,9 @@
 
                 filteredTasks.forEach(task => {
                     const isCompleted = task.status === 'Concluído';
+                    const isBirthday = task.status === 'Aniversário';
                     const item = document.createElement('div');
-                    item.className = `task-item ${isCompleted ? 'completed' : ''}`;
+                    item.className = `task-item ${isCompleted ? 'completed' : ''} ${isBirthday ? 'birthday-task-item' : ''}`;
                     
                     item.innerHTML = `
                         <div class="d-flex align-items-center me-2">
@@ -698,11 +809,12 @@
                                 <div class="small text-muted">
                                     <i class="fa-regular fa-clock me-1"></i> ${task.isDaily ? 'Todo dia' : formatDate(task.date)} ${task.time ? '| ' + task.time : ''}
                                 </div>
+                                ${task.gift ? `<div class="small text-purple fw-semibold mt-1"><i class="fa-solid fa-gift me-1"></i>Dica: ${task.gift}</div>` : ''}
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             ${task.isDaily ? '<span class="badge-status badge-diario"><i class="fa-solid fa-rotate me-1"></i>Diário</span>' : ''}
-                            <span class="badge-status badge-${getStatusClass(task.status)}">${task.status}</span>
+                            <span class="badge-status badge-${getStatusClass(task.status)}">${isBirthday ? '<i class="fa-solid fa-cake-candles me-1"></i>' : ''}${task.status}</span>
                             <button class="btn btn-link text-secondary p-0 ms-1" onclick="openEditModal(${task.id})" title="Editar atividade">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
@@ -768,6 +880,7 @@
             switch(status) {
                 case 'Em Andamento': return 'andamento';
                 case 'Concluído': return 'concluido';
+                case 'Aniversário': return 'aniversario';
                 default: return 'aguardando';
             }
         }

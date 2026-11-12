@@ -27,19 +27,23 @@
             --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.04);
             --radius-custom: 16px;
             --input-bg: #ffffff;
+            --input-color: #2c3e50;
+            --input-placeholder: #94a3b8;
             --item-bg: #ffffff;
         }
 
-        /* Estilos do Modo Escuro */
+        /* Estilos do Modo Escuro com alto contraste integral */
         body.dark-mode {
             --bg-main: #0f172a;
             --card-bg: #1e293b;
             --accent-soft: #1e3a29;
-            --text-dark: #f1f5f9;
-            --text-muted: #94a3b8;
+            --text-dark: #f8fafc;
+            --text-muted: #cbd5e1;
             --border-color: #334155;
             --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.3);
             --input-bg: #0f172a;
+            --input-color: #ffffff;
+            --input-placeholder: #94a3b8;
             --item-bg: #0f172a;
         }
 
@@ -126,27 +130,60 @@
             color: white;
         }
 
+        /* Ajustes de Legibilidade dos Formulários */
         .form-control, .form-select, .input-group-text {
             border-radius: 10px;
             border: 1px solid var(--border-color);
             padding: 0.6rem 1rem;
             background-color: var(--input-bg);
-            color: var(--text-dark);
+            color: var(--input-color) !important;
         }
 
-        body.dark-mode .form-control, 
-        body.dark-mode .form-select,
-        body.dark-mode .input-group-text {
-            background-color: var(--input-bg);
+        .form-control::placeholder {
+            color: var(--input-placeholder) !important;
+            opacity: 1;
+        }
+
+        .form-select option {
+            background-color: var(--card-bg);
             color: var(--text-dark);
-            border-color: var(--border-color);
         }
 
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-sage);
             box-shadow: 0 0 0 0.25rem rgba(74, 124, 89, 0.15);
             background-color: var(--input-bg);
+            color: var(--input-color) !important;
+        }
+
+        /* Garantia de Texto Claro no Modo Escuro para Todos os Elementos */
+        body.dark-mode p, 
+        body.dark-mode span, 
+        body.dark-mode label, 
+        body.dark-mode h1, 
+        body.dark-mode h5, 
+        body.dark-mode h6, 
+        body.dark-mode div,
+        body.dark-mode small {
             color: var(--text-dark);
+        }
+
+        body.dark-mode .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        body.dark-mode .text-dark {
+            color: var(--text-dark) !important;
+        }
+
+        body.dark-mode .text-purple {
+            color: #d8b4fe !important;
+        }
+
+        /* Suporte específico para ícones de data/hora no Webkit */
+        body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+        body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
         }
 
         /* Container de Rolagem das Atividades */

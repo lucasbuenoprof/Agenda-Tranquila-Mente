@@ -111,6 +111,25 @@
             box-shadow: 0 0 0 0.25rem rgba(74, 124, 89, 0.15);
         }
 
+        /* Container de Rolagem das Atividades */
+        .tasks-scroll-container {
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .tasks-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .tasks-scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .tasks-scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
         .task-item {
             display: flex;
             align-items: center;
@@ -303,27 +322,31 @@
         <div class="custom-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
                 <h6 class="fw-bold mb-0">Meus Lembretes e Atividades!</h6>
-                <div class="d-flex gap-2 w-100 w-md-auto flex-wrap" style="max-width: 550px;">
+                <div class="d-flex gap-2 w-100 w-md-auto flex-wrap" style="max-width: 420px;">
                     <div class="input-group input-group-sm flex-nowrap" style="max-width: 200px;">
                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-regular fa-calendar-days"></i></span>
                         <input type="text" id="dateFilterInput" class="form-control border-start-0 ps-0" placeholder="Filtrar por data..." onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
                     </div>
                     <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar atividade..." style="max-width: 200px;">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-danger btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-trash-can me-1"></i>Limpar
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item small text-danger" href="#" onclick="deleteTasksBySelectedDate()"><i class="fa-solid fa-calendar-xmark me-2"></i>Apagar deste dia</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteAllTasks()"><i class="fa-solid fa-triangle-exclamation me-2"></i>Apagar TUDO</a></li>
-                        </ul>
-                    </div>
                 </div>
             </div>
             
-            <div id="tasksList">
+            <div id="tasksList" class="tasks-scroll-container">
                 <!-- Atividades injetadas dinamicamente -->
+            </div>
+
+            <!-- Opções de Limpeza no Rodapé da Lista -->
+            <div class="d-flex justify-content-end align-items-center pt-3 mt-2 border-top">
+                <div class="dropdown">
+                    <button class="btn btn-outline-danger btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-trash-can me-1"></i>Opções de Limpeza
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item small text-danger" href="#" onclick="deleteTasksBySelectedDate()"><i class="fa-solid fa-calendar-xmark me-2"></i>Apagar atividades do dia selecionado</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteAllTasks()"><i class="fa-solid fa-triangle-exclamation me-2"></i>Ou Apagar TUDO!</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -735,7 +758,6 @@
 
         function triggerConfetti(isBirthday = false) {
             if (isBirthday) {
-                // Confete reforçado/festivo para aniversários
                 confetti({
                     particleCount: 100,
                     spread: 80,
